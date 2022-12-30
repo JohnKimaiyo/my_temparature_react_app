@@ -1,86 +1,37 @@
-import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
-import MovieList from "./components/MovieList";
-import MovieListHeading from "./components/MovieListHeading";
-import SearchBox from "./components/SearchBox";
-import AddFavourites from "./components/AddFavourites";
-import RemoveFavourites from "./components/RemoveFavourite";
+import React, { useState } from 'react';
 
 const App = () => {
-  const [movies, setMovies] = useState([]);
-  const [favourites, setFavourites] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+	const [temperatureValue, setTemperatureValue] = useState(10);
+	const [temperatureColor, setTemperatureColor] = useState('cold');
 
-  const getMovieRequest = async (searchValue) => {
-    const url = `http://www.omdbapi.com/?s=${searchValue}&apikey=263d22d8`;
+	const increaseTemperature = () => {
+		const newTemperature = temperatureValue + 1;
+		setTemperatureValue(newTemperature);
 
-    const response = await fetch(url);
-    const responseJson = await response.json();
+		if (newTemperature >= 15) {
+			setTemperatureColor('hot');
+		}
+	};
 
-    if (responseJson.Search) {
-      setMovies(responseJson.Search);
-    }
-  };
+	const decreaseTemperature = () => {
+		const newTemperature = temperatureValue - 1;
+		setTemperatureValue(newTemperature);
+		if (newTemperature < 15) {
+			setTemperatureColor('cold');
+		}
+	};
 
-  useEffect(() => {
-    getMovieRequest(searchValue);
-  }, [searchValue]);
-
-  useEffect(() => {
-    const movieFavourites = JSON.parse(
-      localStorage.getItem("react-movie-app-favourites")
-    );
-
-    if (movieFavourites) {
-      setFavourites(movieFavourites);
-    }
-  }, []);
-
-  const saveToLocalStorage = (items) => {
-    localStorage.setItem("react-movie-app-favourites", JSON.stringify(items));
-  };
-
-  const addFavouriteMovie = (movie) => {
-    const newFavouriteList = [...favourites, movie];
-    setFavourites(newFavouriteList);
-    saveToLocalStorage(newFavouriteList);
-  };
-
-  const removeFavouriteMovie = (movie) => {
-    const newFavouriteList = favourites.filter(
-      (favourite) => favourite.imdbID !== movie.imdbID
-    );
-
-    setFavourites(newFavouriteList);
-    saveToLocalStorage(newFavouriteList);
-  };
-
-  return (
-    <div className="container-fluid movie-app">
-      <div className="row d-flex align-items-center mt-4 mb-4">
-        <MovieListHeading heading="Movies" />
-        <SearchBox searchValue={searchValue} setSearchValue={setSearchValue} />
-      </div>
-      <div className="row">
-        <MovieList
-          movies={movies}
-          handleFavouritesClick={addFavouriteMovie}
-          favouriteComponent={AddFavourites}
-        />
-      </div>
-      <div className="row d-flex align-items-center mt-4 mb-4">
-        <MovieListHeading heading="Favourites" />
-      </div>
-      <div className="row">
-        <MovieList
-          movies={favourites}
-          handleFavouritesClick={removeFavouriteMovie}
-          favouriteComponent={RemoveFavourites}
-        />
-      </div>
-    </div>
-  );
+	return (
+		<div className='app-container'>
+			<div className='temperature-display-container'>
+				<div className={`temperature-display ${temperatureColor}`}>{temperatureValue}°C</div>
+			</div>
+			<div className='button-container'>
+				<button onClick={increaseTemperature}>+</button>
+				<button onClick={decreaseTemperature}>-</button>
+			</div>
+		</div>
+	);
 };
 
 export default App;
